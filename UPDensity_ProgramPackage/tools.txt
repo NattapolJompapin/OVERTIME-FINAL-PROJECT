@@ -1,0 +1,165 @@
+RESTapi
+FastApi ตัวเขียน api
+Uvicorn  ตัวเปิดเซิฟเวอร์ให้เรียก api
+SQLite3
+Python
+OpenCV
+YOLOmodel ultralytics
+
+Edge Device
+Docker
+VScode
+HTML/CSS/JAVAscript
+
+IP Webcam
+Tailscale VPN
+
+LINEapi
+LINEOA
+
+
+
+
+
+
+
+
+┌────────────────────┐
+│   IP Camera / CCTV │
+│ (หลายจุด หลายกล้อง) │
+└─────────┬──────────┘
+          │  Video Stream (RTSP / HTTP)
+          ▼
+┌────────────────────┐
+│   Edge Device      │
+│ (PC / Jetson / NUC)│
+│                    │
+│  ┌──────────────┐  │
+│  │ OpenCV       │  │  ← ดึงภาพจากกล้อง
+│  └──────┬───────┘  │
+│         ▼          │
+│  ┌──────────────┐  │
+│  │ YOLO Model   │  │  ← ตรวจจับคน
+│  │ (Ultralytics)│  │
+│  └──────┬───────┘  │
+│         ▼          │
+│  ┌──────────────┐  │
+│  │ Count Logic  │  │  ← นับจำนวน
+│  └──────┬───────┘  │
+│         ▼          │
+│  ┌──────────────┐  │
+│  │ CameraWorker │  │
+│  │ (per camera) │  │
+│  └──────┬───────┘  │
+└─────────┼──────────┘
+          │  REST API (POST)
+          ▼
+┌─────────────────────────────┐
+│        Central Server       │
+│                             │
+│  ┌────────────────────────┐ │
+│  │ FastAPI + Uvicorn      │ │  ← เปิด Server
+│  │ REST API               │ │
+│  └──────────┬─────────────┘ │
+│             ▼               │
+│  ┌────────────────────────┐ │
+│  │ SQLite Database        │ │
+│  │ passenger.db           │ │  ← เก็บข้อมูล
+│  └──────────┬─────────────┘ │
+│             ▼               │
+│  ┌────────────────────────┐ │
+│  │ GET API                │ │
+│  │ /api/camera/{id}       │ │
+│  └──────────┬─────────────┘ │
+└─────────────┼────────────────┘
+              │ REST API (GET)
+              ▼
+┌──────────────────────────────┐
+│       Web Dashboard          │
+│  (HTML / CSS / JavaScript)   │
+│                              │
+│  - Grid multi-camera         │
+│  - Color threshold           │
+│  - Auto refresh              │
+│  - Real-time monitoring      │
+└──────────────────────────────┘
+
+
+
+
+
+
+
+
+1️⃣ AI / Computer Vision
+🔹 Ultralytics YOLO
+ตรวจจับคนจากกล้อง CCTV / IP Camera
+นับจำนวนผู้โดยสาร
+รันแบบ real-time
+ใช้หลายกล้อง
+from ultralytics import YOLO
+model = YOLO("best.pt")
+📌 ระดับ: หัวใจของระบบ AI
+
+2️⃣ Video / Camera Tool
+🔹 OpenCV (cv2)
+รับภาพจาก IP Camera
+แสดงผล
+resize / overlay text
+cap = cv2.VideoCapture(url)
+ret, frame = cap.read()
+📌 ระดับ: ตัวเชื่อมกล้องกับโมเดล
+
+3️⃣ Backend / Central Server
+🔹 FastAPI
+สร้าง REST API
+   API ที่คุณมี:
+   POST /api/camera/{cam_id}
+   GET /api/camera/{cam_id}/latest
+รับข้อมูลจากกล้อง
+ให้ Dashboard ดึงข้อมูล
+from fastapi import FastAPI
+app = FastAPI()
+📌 ระดับ: ศูนย์กลางระบบ
+🔹 Uvicorn
+เปิด Server ให้ FastAPI ทำงาน
+รับ request พร้อมกันหลายตัว
+uvicorn main:app --port 8000
+📌 ระดับ: ปุ่มเปิดระบบ
+
+4️⃣ Database
+🔹 SQLite (passenger.db)
+เก็บข้อมูลจำนวนคน + เวลา + กล้อง
+ไม่ต้องติดตั้งเพิ่ม
+CREATE TABLE counts (
+  camera_id TEXT,
+  count INTEGER,
+  timestamp TEXT
+);
+📌 ระดับ: สมุดบันทึกกลาง
+
+5️⃣ Frontend / Dashboard
+🔹 HTML / CSS / JavaScript
+แสดงผลข้อมูลแบบ Real-time
+แยกเป็นเว็บ Dashboard จริง
+Auto refresh
+fetch("/api/camera/cam01/latest")
+📌 ระดับ: หน้าแสดงผลผู้ใช้
+
+6️⃣ System / Architecture Tool
+🔹 multiprocessing
+รันหลายกล้องพร้อมกัน
+แยก process ไม่ชนกัน
+Process(target=run_camera, args=(cam_id, url)).start()
+📌 ระดับ: รองรับ scale
+🔹 requests
+ส่งข้อมูลจาก Edge → Central
+requests.post(CENTRAL_API, json=data)
+📌 ระดับ: สายส่งข้อมูล
+
+
+
+
+
+
+

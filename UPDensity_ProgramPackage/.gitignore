@@ -1,0 +1,24 @@
+# python
+venv/
+__pycache__/
+*.pyc
+
+# dataset / videos
+videos/
+*.mp4
+*.avi
+
+# outputs
+runs/
+outputs/
+
+# models
+*.pt
+*.pth
+
+# logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

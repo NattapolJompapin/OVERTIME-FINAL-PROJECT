@@ -1,0 +1,8 @@
+version: "3"
+services:
+  central:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.central
+    ports:
+      - "8000:8000"

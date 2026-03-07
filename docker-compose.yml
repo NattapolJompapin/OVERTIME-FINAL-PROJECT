@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Chizo1412Za@
+      MYSQL_DATABASE: BusStop
+    ports:
+      - "3306:3306"

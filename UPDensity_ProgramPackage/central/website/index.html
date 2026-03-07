@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Passenger Density Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h2>Passenger Density (All Cameras)</h2>
+<canvas id="densityChart" width="1000" height="450"></canvas>
+
+<script>
+const ctx = document.getElementById('densityChart');
+let chart = null;
+
+// สีประจำกล้อง
+const cameraColors = {
+    CAM01: 'red',
+    CAM02: 'blue',
+    CAM03: 'green',
+    CAM04: 'orange'
+};
+
+async function loadGraph() {
+    const res = await fetch('/api/graph/all');
+    const data = await res.json();
+
+    // ดึง timestamp ทั้งหมด (แกน X)
+    const labels = [...new Set(data.map(d => d.Timestamp))];
+
+    // แยก dataset ตามกล้อง
+    const datasets = Object.keys(cameraColors).map(cam => {
+        const camData = data.filter(d => d.Camera_ID === cam);
+        const values = labels.map(t => {
+            const found = camData.find(d => d.Timestamp === t);
+            return found ? found.PassengerCount : null;
+        });
+
+        return {
+            label: cam,
+            data: values,
+            borderColor: cameraColors[cam],
+            borderWidth: 2,
+            tension: 0.3
+        };
+    });
+
+    if (chart) {
+        chart.data.labels = labels;
+        chart.data.datasets = datasets;
+        chart.update();
+    } else {
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Passengers'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// โหลดครั้งแรก
+loadGraph();
+
+// โหลดซ้ำทุก 30 วินาที
+setInterval(loadGraph, 30000);
+</script>
+
+</body>
+</html>
