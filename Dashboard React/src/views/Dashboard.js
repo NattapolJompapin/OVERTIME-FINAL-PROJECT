@@ -135,6 +135,8 @@ const themeStyle = `
   }
 
   .badge-soft-success { background-color: #d1fae5; color: #065f46; border-radius: 8px; padding: 6px 12px; border: none; }
+  .badge-soft-warning { background-color: #fef3c7; color: #b45309; border-radius: 8px; padding: 6px 12px; border: none; }
+  .badge-soft-orange { background-color: #ffedd5; color: #c2410c; border-radius: 8px; padding: 6px 12px; border: none; }
   .badge-soft-danger { background-color: #fee2e2; color: #991b1b; border-radius: 8px; padding: 6px 12px; border: none; }
 `;
 
@@ -201,9 +203,20 @@ function Dashboard() {
       
       const newMarkers = tableData.map(item => {
         const coords = stationCoords[item.stationName] || { lat: 0, lng: 0 };
+        
+        // กำหนดสีตามจำนวนคน 4 ระดับ
+        let bgColor = '#2dce89'; // 0-20 (สีเขียว)
+        if (item.passengerCount >= 41) {
+          bgColor = '#f5365c'; // 41+ (สีชมพู/แดง)
+        } else if (item.passengerCount >= 31) {
+          bgColor = '#fd7e14'; // 31-40 (สีส้ม)
+        } else if (item.passengerCount >= 21) {
+          bgColor = '#ffc107'; // 21-30 (สีเหลือง)
+        }
+
         const icon = L.divIcon({
           className: 'custom-icon',
-          html: `<div style="background-color: ${item.passengerCount > 20 ? '#f5365c' : '#2dce89'}; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${item.passengerCount}</div>`,
+          html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${item.passengerCount}</div>`,
           iconSize: [35, 35],
           iconAnchor: [17, 17]
         });
@@ -287,23 +300,40 @@ function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {tableData.map((item, index) => (
-                          <tr key={index}>
-                            <td className="fw-bold text-dark">{item.stationName}</td>
-                            <td>
-                              <span className="fs-5 fw-bold">{item.passengerCount}</span> 
-                              <small className="text-muted ms-1"> คน</small>
-                            </td>
-                            <td>
-                              <Badge className={item.passengerCount > 20 ? "badge-soft-danger" : "badge-soft-success"}>
-                                {item.passengerCount > 20 ? "● หนาแน่น" : "● ปกติ"}
-                              </Badge>
-                            </td>
-                            <td className="text-muted small">
-                              {item.timestamp ? new Date(item.timestamp).toLocaleTimeString("th-TH") : "-"}
-                            </td>
-                          </tr>
-                        ))}
+                        {tableData.map((item, index) => {
+                          // กำหนด Badge และข้อความสถานะตาม 4 ระดับ
+                          let badgeClass = "badge-soft-success";
+                          let statusText = "● ปกติ";
+                          
+                          if (item.passengerCount >= 41) {
+                            badgeClass = "badge-soft-danger";
+                            statusText = "● หนาแน่นมาก";
+                          } else if (item.passengerCount >= 31) {
+                            badgeClass = "badge-soft-orange";
+                            statusText = "● หนาแน่น";
+                          } else if (item.passengerCount >= 21) {
+                            badgeClass = "badge-soft-warning";
+                            statusText = "● ปานกลาง";
+                          }
+
+                          return (
+                            <tr key={index}>
+                              <td className="fw-bold text-dark">{item.stationName}</td>
+                              <td>
+                                <span className="fs-5 fw-bold">{item.passengerCount}</span> 
+                                <small className="text-muted ms-1"> คน</small>
+                              </td>
+                              <td>
+                                <Badge className={badgeClass}>
+                                  {statusText}
+                                </Badge>
+                              </td>
+                              <td className="text-muted small">
+                                {item.timestamp ? new Date(item.timestamp).toLocaleTimeString("th-TH") : "-"}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </Table>
                   </div>
