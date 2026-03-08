@@ -8,7 +8,9 @@ from camera_worker import run_camera
 # value = stream source (URL หรือ device index)
 CAMERAS = {
     "CAM01": "http://100.66.186.93:8080/video",  # IP Camera
-    "CAM02": 0                                   # Webcam / USB Camera
+    "CAM02": 0,                                   # Webcam / USB Camera
+    "CAM03": "rtsp://admin:L2120C9E@192.168.50.96:554/cam/realmonitor?channel=1&subtype=0",
+    "CAM04": "rtsp://admin:L2120C9E@192.168.50.96:554/cam/realmonitor?channel=1&subtype=1"
 }
 
 

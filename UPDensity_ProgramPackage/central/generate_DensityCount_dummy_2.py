@@ -16,7 +16,7 @@ DB_CONFIG = {
 CAMERAS = ["CAM01", "CAM02", "CAM03", "CAM04"]
 
 # ⭐ ปรับช่วงวันตรงนี้ [วันเริ่ม : วันสิ้นสุด]
-DATE_RANGE = ("2026-01-16", "2026-02-26")
+DATE_RANGE = ("2026-02-25", "2026-03-08")
 
 DAY_START_HOUR = 7
 DAY_END_HOUR = 22
@@ -64,7 +64,7 @@ def generate_passenger_count(camera_id, current_time):
         return random.randint(0, 5)
 
     if is_peak_time(camera_id, current_time):
-        return random.randint(25, 40)
+        return random.randint(25, 50)
 
     return random.randint(5, 15)
 

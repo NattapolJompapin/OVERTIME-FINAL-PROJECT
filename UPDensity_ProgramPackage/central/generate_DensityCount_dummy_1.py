@@ -18,8 +18,8 @@ DB_CONFIG = {
 
 CAMERAS = ["CAM01", "CAM02", "CAM03", "CAM04"]
 
-START_TIME = datetime(2026, 2, 17, 7, 0, 0)
-END_TIME   = datetime(2026, 2, 17, 22, 0, 0)
+START_TIME = datetime(2026, 2, 27, 7, 0, 0)
+END_TIME   = datetime(2026, 3, 8, 22, 0, 0)
 INTERVAL   = timedelta(seconds=60)  # 5 นาท4
 
 # -------------------------
@@ -58,10 +58,10 @@ def generate_passenger_count(camera_id, current_time):
 
     # 🔥 ช่วงหนาแน่นของกล้องนั้น
     if is_peak_time(camera_id, current_time):
-        return random.randint(25, 40)
+        return random.randint(25, 62)
 
     # 🙂 ช่วงปกติ
-    return random.randint(5, 15)
+    return random.randint(2, 19)
 
 # -------------------------
 # MAIN
